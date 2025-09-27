@@ -128,6 +128,7 @@ function CreateRoom() {
             onChange={(e) => setRoomName(e.target.value)}
             margin="normal"
             placeholder="Give your room a friendly name"
+            required
           />
 
           <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
