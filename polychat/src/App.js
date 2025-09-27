@@ -4,10 +4,10 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import './App.css';
 
-// Components
-import HomePage from './components/HomePage';
-import ChatRoom from './components/ChatRoom';
-import CreateRoom from './components/CreateRoom';
+// Pages
+import HomePage from './pages/HomePage';
+import ChatRoom from './pages/ChatRoom';
+import CreateRoom from './pages/CreateRoom';
 
 // Create Material-UI theme
 const theme = createTheme({

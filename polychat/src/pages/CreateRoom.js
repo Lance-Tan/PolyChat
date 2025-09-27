@@ -15,7 +15,6 @@ import {
   Alert
 } from '@mui/material';
 import { ArrowBack, ContentCopy } from '@mui/icons-material';
-import io from 'socket.io-client';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -124,7 +123,7 @@ function CreateRoom() {
 
           <TextField
             fullWidth
-            label="Room Name (Optional)"
+            label="Room Name"
             value={roomName}
             onChange={(e) => setRoomName(e.target.value)}
             margin="normal"
