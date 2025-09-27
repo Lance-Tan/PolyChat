@@ -10,10 +10,8 @@ const config = {
   },
   
   translation: {
-    service: process.env.TRANSLATION_SERVICE || 'libre',
-    libreTranslateUrl: process.env.LIBRETRANSLATE_URL || 'https://libretranslate.com',
-    googleApiKey: process.env.TRANSLATION_API_KEY,
-    microsoftApiKey: process.env.MICROSOFT_TRANSLATOR_KEY
+    service: 'libre',
+    libreTranslateUrl: 'https://libretranslate.com',
   },
   
   database: {

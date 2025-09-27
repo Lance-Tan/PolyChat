@@ -50,9 +50,11 @@ class SocketController {
       message: `${username} joined the chat`
     });
     
-    // Send current room users to the new user
+    // Get updated room users and send to everyone in the room
     const roomUsers = roomService.getRoomUsers(roomId);
-    socket.emit('room-users', roomUsers);
+    
+    // Send updated user list to all users in the room
+    this.io.to(roomId).emit('room-users', roomUsers);
   }
 
   /**
@@ -84,19 +86,16 @@ class SocketController {
         );
       }
 
-      // Find the socket ID for this user
-      const targetSocketId = this.findSocketIdByUser(targetUser);
-      if (targetSocketId) {
-        this.io.to(targetSocketId).emit('message-received', {
-          id: Date.now() + Math.random(),
-          username: user.username,
-          message: translatedMessage,
-          originalMessage: message,
-          originalLanguage,
-          targetLanguage: targetUser.language,
-          timestamp: new Date().toISOString()
-        });
-      }
+      // Use the socketId directly from the room users
+      this.io.to(targetUser.socketId).emit('message-received', {
+        id: Date.now() + Math.random(),
+        username: user.username,
+        message: translatedMessage,
+        originalMessage: message,
+        originalLanguage,
+        targetLanguage: targetUser.language,
+        timestamp: new Date().toISOString()
+      });
     }
   }
 
@@ -114,25 +113,14 @@ class SocketController {
         username,
         message: `${username} left the chat`
       });
+      
+      // Send updated user list to remaining users in the room
+      const roomUsers = roomService.getRoomUsers(roomId);
+      this.io.to(roomId).emit('room-users', roomUsers);
     }
     console.log('User disconnected:', socket.id);
   }
 
-  /**
-   * Find socket ID by user object
-   * @param {Object} targetUser - Target user object
-   * @returns {string|null} Socket ID or null
-   */
-  findSocketIdByUser(targetUser) {
-    for (const [socketId, user] of roomService.users.entries()) {
-      if (user.username === targetUser.username && 
-          user.language === targetUser.language && 
-          user.roomId === targetUser.roomId) {
-        return socketId;
-      }
-    }
-    return null;
-  }
 }
 
 module.exports = SocketController;

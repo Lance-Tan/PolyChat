@@ -55,11 +55,14 @@ class RoomService {
   /**
    * Get all users in a room
    * @param {string} roomId - Room ID
-   * @returns {Array} Array of user objects
+   * @returns {Array} Array of user objects with socketId
    */
   getRoomUsers(roomId) {
     const roomUserIds = Array.from(this.rooms.get(roomId) || []);
-    return roomUserIds.map(id => this.users.get(id)).filter(Boolean);
+    return roomUserIds.map(id => {
+      const user = this.users.get(id);
+      return user ? { ...user, socketId: id } : null;
+    }).filter(Boolean);
   }
 
   /**
