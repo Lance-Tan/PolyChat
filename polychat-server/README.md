@@ -24,7 +24,7 @@ polychat-server/
 
 ### **Services** (`/services/`)
 - **`roomService.js`**: Manages rooms and users in memory
-- **`translationService.js`**: Handles LibreTranslate API calls
+- **`translationService.js`**: Handles LLM-based translation via Python script
 
 ### **Controllers** (`/controllers/`)
 - **`socketController.js`**: Handles all Socket.IO events and real-time communication
@@ -59,7 +59,7 @@ polychat-server/
 1. User sends message in their language
 2. Server identifies all users in the room
 3. For each user with a different language:
-   - Calls LibreTranslate API
+   - Calls Python translator script with LLM
    - Sends translated message to that user
 4. Users see messages in their native language
 
@@ -67,8 +67,11 @@ polychat-server/
 
 ```env
 PORT=5000
-TRANSLATION_SERVICE=libre
-LIBRETRANSLATE_URL=https://libretranslate.com
+BASE_URL=https://api.ai.it.ufl.edu
+API_KEY=your_api_key_here
+MODEL=mistral-7b-instruct
+LLM_TEMPERATURE=0.0
+LLM_SYSTEM_PROMPT=optional_system_prompt
 CORS_ORIGIN=http://localhost:3000
 ```
 
