@@ -14,10 +14,14 @@ class TranslationService {
    * @returns {Promise<string>} Translated text
    */
   async translateText(text, targetLanguage, sourceLanguage = 'auto') {
+    console.log(`🔄 Translating: "${text}" to ${targetLanguage}`);
     try {
-      return await this._translateWithLLM(text, targetLanguage);
+      const result = await this._translateWithLLM(text, targetLanguage);
+      console.log(`✅ Translation result: "${result}"`);
+      return result;
     } catch (error) {
-      console.error('Translation error:', error);
+      console.error('❌ Translation error:', error.message);
+      console.log(`⚠️ Returning original text: "${text}"`);
       return text; // Return original text if translation fails
     }
   }
@@ -40,8 +44,10 @@ class TranslationService {
           LLM_TEMPERATURE: this.llmConfig.temperature.toString(),
           LLM_SYSTEM_PROMPT: this.llmConfig.systemPrompt || '',
           TEXT: text,
-          TARGET_LANGUAGE: targetLanguage
-        }
+          TARGET_LANGUAGE: targetLanguage,
+          PYTHONIOENCODING: 'utf-8'
+        },
+        stdio: ['pipe', 'pipe', 'pipe']
       });
 
       let output = '';

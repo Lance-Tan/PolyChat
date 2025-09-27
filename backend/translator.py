@@ -10,6 +10,12 @@ from langchain.prompts.chat import (
 )
 from langchain.schema import HumanMessage, SystemMessage
 
+# Fix encoding issues on Windows
+if sys.platform.startswith('win'):
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.detach())
+
 load_dotenv()
 
 # Build the ChatOpenAI client exactly like your template
@@ -39,11 +45,12 @@ def translate_message(
     """
 
     system_content = (
-        "You are a professional translator. Translate the user's message into "
-        f"{target_language} that is easy for the user to read.\n"
-        "Preserve meaning, tone, emojis, punctuation, and any Markdown formatting.\n"
-        "Preserve code blocks verbatim. Do not add commentary—return only the translation.\n"
-        f"If the input already appears to be in {target_language}, return a clear, natural rewrite in {target_language}."
+        f"You are a professional translator. Translate the user's message into {target_language}.\n"
+        f"CRITICAL: Return ONLY the translated text. Do not add explanations, notes, or commentary.\n"
+        f"Preserve meaning, tone, emojis, punctuation, and Markdown formatting.\n"
+        f"Keep code blocks verbatim.\n"
+        f"If the input is already in {target_language}, provide a natural {target_language} rewrite.\n"
+        f"Your response must contain only the translation, nothing else."
     )
 
     glossary_text = glossary or ""
@@ -57,7 +64,30 @@ def translate_message(
     ]
 
     resp = chat(messages)
-    return getattr(resp, "content", str(resp))
+    result = getattr(resp, "content", str(resp))
+    
+    # Clean up the response - remove any extra commentary
+    lines = result.strip().split('\n')
+    # Take only the first line that looks like actual translation content
+    # (not explanatory text in parentheses)
+    clean_result = ""
+    for line in lines:
+        line = line.strip()
+        # Skip lines that are clearly commentary
+        if (line.startswith('(') and line.endswith(')')) or \
+           line.startswith('GLOSSARY:') or \
+           line.startswith('(Emoji:') or \
+           line.startswith('(Markdown') or \
+           line.startswith('(Code blocks') or \
+           line.startswith('(If the input'):
+            continue
+        # Take the first substantial line as the translation
+        if line and not line.startswith('('):
+            clean_result = line
+            break
+    
+    # If we didn't find a clean result, return the original first line
+    return clean_result if clean_result else lines[0].strip()
 
 
 def main():
