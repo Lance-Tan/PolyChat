@@ -226,7 +226,7 @@ function ChatRoom() {
                           {msg.username}
                         </Typography>
                         <Chip 
-                          label={languages[msg.targetLanguage] || msg.targetLanguage}
+                          label={languages[msg.originalLanguage] || msg.originalLanguage}
                           size="small"
                           icon={<LanguageIcon />}
                           color="primary"
@@ -240,13 +240,15 @@ function ChatRoom() {
                         {msg.message}
                       </Typography>
                       {msg.originalMessage && msg.originalMessage !== msg.message && (
-                        <Typography 
-                          variant="caption" 
-                          color="text.secondary"
-                          sx={{ fontStyle: 'italic' }}
-                        >
-                          Original: {msg.originalMessage}
-                        </Typography>
+                        <Box sx={{ mt: 0.5 }}>
+                          <Typography 
+                            variant="caption" 
+                            color="text.secondary"
+                            sx={{ fontStyle: 'italic' }}
+                          >
+                            Original ({languages[msg.originalLanguage] || msg.originalLanguage}): {msg.originalMessage}
+                          </Typography>
+                        </Box>
                       )}
                     </Box>
                   )}
