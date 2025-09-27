@@ -37,18 +37,13 @@ def translate_message(
     Translate `text` into `target_language` using an OpenAI-compatible endpoint.
 
     - Preserves meaning, tone, emojis, and Markdown
-    - Keeps code blocks verbatim
     - If input already appears to be in target language, rewrites naturally
-    - `glossary` can be a newline list like:
-        Heart failure=Insuficiencia cardiaca
-        Stroke=Accidente cerebrovascular
     """
 
     system_content = (
         f"You are a professional translator. Translate the user's message into {target_language}.\n"
         f"CRITICAL: Return ONLY the translated text. Do not add explanations, notes, or commentary.\n"
         f"Preserve meaning, tone, emojis, punctuation, and Markdown formatting.\n"
-        f"Keep code blocks verbatim.\n"
         f"If the input is already in {target_language}, provide a natural {target_language} rewrite.\n"
         f"Your response must contain only the translation, nothing else."
     )

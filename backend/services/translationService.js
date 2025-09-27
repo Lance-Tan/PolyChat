@@ -14,14 +14,14 @@ class TranslationService {
    * @returns {Promise<string>} Translated text
    */
   async translateText(text, targetLanguage, sourceLanguage = 'auto') {
-    console.log(`🔄 Translating: "${text}" to ${targetLanguage}`);
+    console.log(`Translating: "${text}" to ${targetLanguage}`);
     try {
       const result = await this._translateWithLLM(text, targetLanguage);
-      console.log(`✅ Translation result: "${result}"`);
+      console.log(`Translation result: "${result}"`);
       return result;
     } catch (error) {
-      console.error('❌ Translation error:', error.message);
-      console.log(`⚠️ Returning original text: "${text}"`);
+      console.error('Translation error:', error.message);
+      console.log(`Returning original text: "${text}"`);
       return text; // Return original text if translation fails
     }
   }

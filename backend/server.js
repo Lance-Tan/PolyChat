@@ -33,8 +33,8 @@ io.on('connection', (socket) => {
 // Server startup
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`🚀 PolyChat server running on port ${PORT}`);
-  console.log(`🌍 Translation service: LLM-based (LangChain)`);
-  console.log(`📡 Socket.IO enabled for real-time communication`);
-  console.log(`🔗 API endpoints available at http://localhost:${PORT}/api`);
+  console.log(`PolyChat server running on port ${PORT}`);
+  console.log(`Translation service: LLM-based (LangChain)`);
+  console.log(`Socket.IO enabled for real-time communication`);
+  console.log(`API endpoints available at http://localhost:${PORT}/api`);
 });

@@ -61,7 +61,7 @@ function HomePage() {
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
       <Box textAlign="center" mb={4}>
         <Typography variant="h2" component="h1" gutterBottom>
-          🌍 PolyChat
+          PolyChat
         </Typography>
         <Typography variant="h5" color="text.secondary" gutterBottom>
           Connect with people around the world
