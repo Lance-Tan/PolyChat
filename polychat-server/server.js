@@ -18,11 +18,10 @@ const io = socketIo(server, {
 app.use(cors());
 app.use(express.json());
 
-// Translation service configuration
-const TRANSLATION_SERVICE = process.env.TRANSLATION_SERVICE || 'libre'; // libre, google, microsoft
-const LIBRETRANSLATE_URL = process.env.LIBRETRANSLATE_URL || 'https://libretranslate.com';
+// Libre Config
+const LIBRETRANSLATE_URL = 'https://libretranslate.com';
 
-// In-memory storage for demo (use database in production)
+
 const rooms = new Map();
 const users = new Map();
 
@@ -146,5 +145,4 @@ app.get('/api/rooms', (req, res) => {
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`PolyChat server running on port ${PORT}`);
-  console.log(`Translation service: ${TRANSLATION_SERVICE}`);
 });
