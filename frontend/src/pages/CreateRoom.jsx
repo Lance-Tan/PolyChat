@@ -84,7 +84,7 @@ const CreateRoom = () => {
           
           <form onSubmit={handleCreateRoom} className="space-y-4">
             <div className="form-control">
-              <label className="label">
+              <label className="label pb-1">
                 <span className="label-text">Room Name</span>
               </label>
               <input
