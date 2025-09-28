@@ -61,6 +61,23 @@ const ChatRoom = () => {
     { code: 'gl', name: 'Galician' }
   ];
 
+// Translations for "you" in different languages
+const youTranslations = {
+  'en': 'you', 'es': 'tú', 'fr': 'vous', 'de': 'du', 'it': 'tu',
+  'pt': 'você', 'ru': 'ты', 'ja': 'あなた', 'ko': '당신', 'zh': '你',
+  'ar': 'أنت', 'hi': 'आप', 'nl': 'jij', 'sv': 'du', 'da': 'du',
+  'no': 'du', 'fi': 'sinä', 'pl': 'ty', 'tr': 'sen', 'th': 'คุณ',
+  'vi': 'bạn', 'id': 'kamu', 'ms': 'awak', 'tl': 'ikaw', 'he': 'אתה',
+  'uk': 'ти', 'cs': 'ty', 'hu': 'te', 'ro': 'tu', 'bg': 'ти',
+  'hr': 'ti', 'sk': 'ty', 'sl': 'ti', 'et': 'sina', 'lv': 'tu',
+  'lt': 'tu', 'el': 'εσύ', 'is': 'þú', 'ga': 'tú', 'mt': 'int',
+  'cy': 'ti', 'eu': 'zu', 'ca': 'tu', 'gl': 'ti'
+};
+
+const getYouTranslation = (code) => {
+  return youTranslations[code] || 'you';
+};
+
   const getLanguageName = (code) => {
     const lang = languages.find(l => l.code === code);
     return lang ? lang.name : code;
@@ -261,8 +278,8 @@ const ChatRoom = () => {
             </div>
           </div>
 
-          {/* Users List */}
-          <div className="lg:col-span-1">
+                    {/* Users List */}
+                    <div className="lg:col-span-1">
             <div className="card bg-white dark:bg-gray-800 shadow-lg h-full">
               <div className="card-body p-4">
                 <h3 className="card-title text-lg mb-4">Online Users</h3>
@@ -270,7 +287,14 @@ const ChatRoom = () => {
                   {users.map((user, index) => (
                     <div key={index} className="flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-700 rounded">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{user.username}</span>
+                        <span className="font-medium">
+                          {user.username}
+                          {user.username === currentUser?.username && (
+                            <span className="text-xs text-gray-500 ml-1">
+                              ({getYouTranslation(currentUser.language)})
+                            </span>
+                          )}
+                        </span>
                         <span className="text-sm">{getLanguageFlag(user.language)}</span>
                       </div>
                       <span className="text-xs text-gray-500">
