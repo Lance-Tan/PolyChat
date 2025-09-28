@@ -12,6 +12,10 @@ const ChatRoom = () => {
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [currentResultIndex, setCurrentResultIndex] = useState(0);
+  const [showSearch, setShowSearch] = useState(false);
   const messagesEndRef = useRef(null);
 
   const languages = [
@@ -162,6 +166,76 @@ const getYouTranslation = (code) => {
     setNewMessage('');
   };
 
+  // Search functions
+  const performSearch = (term) => {
+    if (!term.trim()) {
+      setSearchResults([]);
+      setCurrentResultIndex(0);
+      return;
+    }
+
+    const results = messages
+      .filter(message => 
+        message.type !== 'system' && (
+          message.message.toLowerCase().includes(term.toLowerCase()) ||
+          (message.originalMessage && message.originalMessage.toLowerCase().includes(term.toLowerCase())) ||
+          message.username.toLowerCase().includes(term.toLowerCase())
+        )
+      )
+      .map((message, index) => ({ ...message, searchIndex: index }));
+
+    setSearchResults(results);
+    setCurrentResultIndex(0);
+  };
+
+  const handleSearchChange = (e) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+    performSearch(term);
+  };
+
+  const navigateToResult = (direction) => {
+    if (searchResults.length === 0) return;
+    
+    let newIndex = currentResultIndex;
+    if (direction === 'next') {
+      newIndex = (currentResultIndex + 1) % searchResults.length;
+    } else {
+      newIndex = currentResultIndex === 0 ? searchResults.length - 1 : currentResultIndex - 1;
+    }
+    
+    setCurrentResultIndex(newIndex);
+    
+    // Scroll to the result
+    const resultMessage = searchResults[newIndex];
+    const messageElement = document.getElementById(`message-${resultMessage.id}`);
+    if (messageElement) {
+      messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchTerm('');
+    setSearchResults([]);
+    setCurrentResultIndex(0);
+    setShowSearch(false);
+  };
+
+  const highlightText = (text, searchTerm) => {
+    if (!searchTerm.trim()) return text;
+    
+    const regex = new RegExp(`(${searchTerm})`, 'gi');
+    const parts = text.split(regex);
+    
+    return parts.map((part, index) => 
+      regex.test(part) ? (
+        <mark key={index} className="bg-yellow-200 dark:bg-yellow-800 px-1 rounded">
+          {part}
+        </mark>
+      ) : part
+    );
+  };
+
   const formatTime = (timestamp) => {
     return new Date(timestamp).toLocaleTimeString();
   };
@@ -203,11 +277,63 @@ const getYouTranslation = (code) => {
             </div>
           </div>
           <div className="navbar-end">
-            <div className="text-sm text-gray-600 dark:text-gray-300">
-              {users.length} user{users.length !== 1 ? 's' : ''} online
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowSearch(!showSearch)}
+                className="btn btn-ghost btn-sm"
+                title="Search messages"
+              >
+                🔍
+              </button>
+              <div className="text-sm text-gray-600 dark:text-gray-300">
+                {users.length} user{users.length !== 1 ? 's' : ''} online
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Search Bar */}
+        {showSearch && (
+          <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 shadow-sm">
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="Search messages..."
+                className="input input-bordered flex-1"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                autoFocus
+              />
+              {searchResults.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                    {currentResultIndex + 1} of {searchResults.length}
+                  </span>
+                  <button
+                    onClick={() => navigateToResult('prev')}
+                    className="btn btn-sm btn-ghost"
+                    disabled={searchResults.length === 0}
+                  >
+                    ↑
+                  </button>
+                  <button
+                    onClick={() => navigateToResult('next')}
+                    className="btn btn-sm btn-ghost"
+                    disabled={searchResults.length === 0}
+                  >
+                    ↓
+                  </button>
+                </div>
+              )}
+              <button
+                onClick={clearSearch}
+                className="btn btn-sm btn-ghost"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-[calc(100vh-200px)]">
           {/* Chat Messages */}
@@ -216,7 +342,11 @@ const getYouTranslation = (code) => {
               <div className="card-body p-4">
                 <div className="h-full overflow-y-auto space-y-4">
                   {messages.map((message) => (
-                    <div key={message.id} className="chat">
+                    <div 
+                      key={message.id} 
+                      id={`message-${message.id}`}
+                      className={`chat ${searchResults.some(result => result.id === message.id) ? 'bg-yellow-50 dark:bg-yellow-900/20' : ''}`}
+                    >
                       {message.type === 'system' ? (
                         <div className="text-center">
                           <div className="badge badge-info">
@@ -236,7 +366,7 @@ const getYouTranslation = (code) => {
                             </span>
                           </div>
                           <div className="chat-content">
-                            <p>{message.message}</p>
+                            <p>{highlightText(message.message, searchTerm)}</p>
                             {message.originalMessage && message.originalMessage !== message.message && (
                               <div className="mt-2 p-2 bg-black bg-opacity-10 rounded text-sm">
                                 <div className="flex items-center gap-2">
@@ -245,7 +375,7 @@ const getYouTranslation = (code) => {
                                     Original ({getLanguageName(message.originalLanguage)})
                                   </span>
                                 </div>
-                                <p className="italic">{message.originalMessage}</p>
+                                <p className="italic">{highlightText(message.originalMessage, searchTerm)}</p>
                               </div>
                             )}
                           </div>
